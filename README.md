@@ -8,7 +8,7 @@ A página web mostra:
 
 Além da interface web, um LED externo acende como feedback visual sempre que o botão é pressionado.
 
-![Exemplo da Interface Web](https://imgur.com/a/zFj6u4e) 
+![Exemplo da Interface Web](https://i.imgur.com/LjhkjAr.png) 
 ---
 
 ## ✨ Funcionalidades
