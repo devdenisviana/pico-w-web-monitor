@@ -21,8 +21,6 @@ volatile float current_temperature = 0.0f;
 char button_log_buffer[LOG_BUFFER_SIZE] = "Nenhum evento ainda.<br>";
 
 // ======================= SERVIDOR TCP =======================
-// CORREÇÃO: Buffer de resposta agora é estático para ser mais simples e seguro.
-// Evita múltiplos malloc/free e garante que a memória não seja liberada prematuramente.
 #define RESPONSE_BUFFER_SIZE (LOG_BUFFER_SIZE + 1024)
 static char http_response_buffer[RESPONSE_BUFFER_SIZE];
 
@@ -83,7 +81,7 @@ static err_t send_data(void *arg, struct tcp_pcb *tpcb) {
 }
 
 static err_t tcp_server_sent(void *arg, struct tcp_pcb *tpcb, u16_t len) {
-    // CORREÇÃO: Esta função agora continua enviando o resto da mensagem
+    // Esta função continua enviando o resto da mensagem
     // se necessário, em vez de fechar a conexão prematuramente.
     return send_data(arg, tpcb);
 }
@@ -153,7 +151,6 @@ static err_t tcp_server_accept(void *arg, struct tcp_pcb *newpcb, err_t err) {
     return ERR_OK;
 }
 
-// ... (o resto do código, como init_tcp_server, read_internal_temperature, e main, permanece igual ao seu)
 // Função para inicializar o servidor
 bool init_tcp_server(void) {
     // Aloca memória para o estado do nosso servidor.
@@ -257,7 +254,7 @@ int main() {
                     char new_entry[100];
                     snprintf(new_entry, sizeof(new_entry), "Botao pressionado no segundo %lu.<br>", current_time_s);
                     
-                    // BOA PRÁTICA: Protege o acesso ao buffer compartilhado
+                    //Protege o acesso ao buffer compartilhado
                     cyw43_arch_lwip_begin();
                     if (strstr(button_log_buffer, "Nenhum evento") != NULL) {
                         strcpy(button_log_buffer, "");
