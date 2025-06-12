@@ -130,5 +130,72 @@ Conectado com sucesso!
 IP do dispositivo: 192.168.1.XX
 Acessar a Página: Em um navegador web (no celular ou computador) na mesma rede Wi-Fi, acesse o endereço IP exibido.
 Testar: Pressione o botão e veja o LED acender e o log de eventos ser atualizado na página web!
+
+📂 Explicação do Código
+O código C é dividido em blocos organizados por responsabilidade:
+
+📦 1. Inclusões e Definições
+
+#include "pico/stdlib.h" // Funções básicas (GPIO, delays)
+#include "hardware/adc.h" // Leitura da temperatura interna
+#include "lwip/tcp.h"     // Funções TCP/IP
+#include "pico/cyw43_arch.h" // Controle Wi-Fi
+➡️ Define pinos, buffers e estruturas auxiliares.
+
+🌐 2. Servidor TCP
+Funções que implementam o servidor web via TCP:
+
+Função	Função no Código
+init_tcp_server()	Inicializa o servidor escutando na porta 80.
+tcp_server_accept()	Aceita novas conexões TCP de navegadores.
+tcp_server_recv()	Processa a requisição GET e monta a página HTML.
+send_data()	Fragmenta o envio da resposta HTTP (caso o log seja grande).
+tcp_server_close()	Fecha conexões TCP finalizadas.
+
+🔥 3. Monitoramento da Temperatura
+
+void read_internal_temperature()
+➡️ Lê o sensor interno de temperatura do Pico W via ADC e converte para graus Celsius.
+
+🔘 4. Tratamento do Botão (com debounce)
+
+if ((to_ms_since_boot(get_absolute_time()) - last_debounce_time) > DEBOUNCE_DELAY_MS) {
+➡️ Garante que múltiplos toques rápidos não gerem leituras repetidas.
+
+Quando pressionado:
+
+Atualiza o log de eventos.
+
+Atualiza o status para "pressionado".
+
+Acende o LED.
+
+🕸️ 5. Página HTML Gerada
+A resposta HTML inclui:
+
+Temperatura atual formatada.
+
+Status atual do botão.
+
+Área rolável com o log de eventos.
+
+Autoatualização automática a cada 2=1 segundos (<meta http-equiv="refresh" content="1">).
+
+♻️ 6. Loop Principal
+Responsável por:
+
+Atualizar o status do botão.
+
+Atualizar a temperatura.
+
+Manter o servidor TCP funcionando.
+
+Fazer debounce.
+
+while (true) {
+    cyw43_arch_poll();
+    ...
+}
+
 📜 Licença
 Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.

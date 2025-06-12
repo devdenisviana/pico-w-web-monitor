@@ -8,7 +8,7 @@
 #include "lwip/tcp.h"
 #include "lwip/netif.h"
 
-#define WIFI_SSID "suarede"
+#define WIFI_SSID "nomedasuarede"
 #define WIFI_PASSWORD "120625"
 #define LED_PIN 11
 #define BUTTON_PIN 5
@@ -95,7 +95,7 @@ static err_t tcp_server_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, er
             ".status{font-size:20px;margin:10px 0;}.temperature{color:#d9534f;}"
             ".log-title{font-weight:bold;margin-top:20px;}"
             ".log-area{background-color:#e9e9e9;border-left:4px solid #5cb85c;padding:10px;margin-top:5px;height:200px;overflow-y:auto;text-align:left;font-family:monospace;}"
-            "</style><meta http-equiv=\"refresh\" content=\"2\"></head><body><h1>Monitoramento Raspberry Pi Pico W</h1>"
+            "</style><meta http-equiv=\"refresh\" content=\"1\"></head><body><h1>Monitoramento Raspberry Pi Pico W</h1>"
             "<div class=\"info-box\">"
             "<p class=\"status temperature\">Temperatura Atual: %.2f &deg;C</p>"
             "<p class=\"status\">Status do Botao: %s</p>"
