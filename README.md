@@ -1,25 +1,27 @@
-# Servidor Web em Raspberry Pi Pico W para Monitoramento de Eventos 📶
+# 📶 Servidor Web em Raspberry Pi Pico W para Monitoramento de Eventos
 
-Este projeto transforma um Raspberry Pi Pico W em um servidor web para monitoramento em tempo real. Ele exibe a temperatura interna do microcontrolador e registra cada pressionamento de um botão conectado, tudo em uma página web que se atualiza automaticamente.
+Este projeto transforma um **Raspberry Pi Pico W** em um **servidor web embarcado** para **monitoramento em tempo real** de temperatura e eventos de botão.
 
-A página web mostra:
-* A temperatura atual da CPU do Pico W.
-* Um log com o timestamp de cada vez que o botão foi pressionado.
+### 🔧 Funcionalidade principal:
 
-Além da interface web, um LED externo acende como feedback visual sempre que o botão é pressionado.
+* Exibe a **temperatura interna** do microcontrolador.
+* Registra **cada pressionamento do botão** com **timestamp**.
+* Página web atualiza automaticamente a cada segundo.
+* Um **LED** pisca quando o botão é pressionado.
 
-![Exemplo da Interface Web](https://i.imgur.com/LjhkjAr.png) 
+![Exemplo da Interface Web](https://i.imgur.com/LjhkjAr.png)
+
 ---
 
 ## ✨ Funcionalidades
 
-* **Servidor Web HTTP:** Hospeda uma página web na porta 80.
-* **Conectividade Wi-Fi:** Conecta-se a uma rede Wi-Fi local.
-* **Log de Eventos:** Registra cada pressionamento de botão com o tempo decorrido desde a inicialização.
-* **Monitoramento de Temperatura:** Lê e exibe a temperatura do sensor interno do Pico W.
-* **Feedback Visual:** Aciona um LED externo simultaneamente com o pressionamento do botão.
-* **Lógica de Debounce:** Evita múltiplas leituras de um único clique no botão.
-* **Comunicação Robusta:** Utiliza uma implementação TCP que envia dados em pacotes, prevenindo falhas quando o log de eventos se torna muito grande.
+✅ **Servidor Web HTTP:** Página web hospedada na porta 80.
+✅ **Conexão Wi-Fi:** Conecta-se automaticamente à sua rede.
+✅ **Log de Eventos:** Registra pressionamentos de botão com tempo decorrido.
+✅ **Monitoramento de Temperatura:** Leitura contínua do sensor interno.
+✅ **Feedback Visual (LED):** LED acende durante o pressionamento do botão.
+✅ **Debounce de Botão:** Evita leituras falsas ou múltiplas.
+✅ **Comunicação TCP Segura:** Fragmenta a resposta quando o log de eventos fica grande.
 
 ---
 
@@ -27,175 +29,118 @@ Além da interface web, um LED externo acende como feedback visual sempre que o 
 
 * 1x Raspberry Pi Pico W
 * 1x LED (qualquer cor)
-* 1x Resistor de ~330Ω (para o LED)
-* 1x Botão de pressão (push-button)
-* 1x Protoboard (placa de ensaio)
-* Fios de jumper
+* 1x Resistor (\~330Ω)
+* 1x Botão (push-button)
+* 1x Protoboard
+* Fios jumper
 
 ---
 
 ## 🔌 Montagem do Circuito
 
-As conexões são simples e utilizam o resistor de pull-up interno do Pico para o botão.
-
-* **LED:**
-    * O pino **positivo** (perna mais longa) do LED conecta-se ao **GPIO 11** (Pino 15).
-    * O pino **negativo** (perna mais curta) do LED conecta-se a uma perna do resistor de 330Ω. A outra perna do resistor conecta-se ao **GND** (qualquer pino de terra, como o Pino 3).
-
-* **Botão:**
-    * Uma perna do botão conecta-se ao **GPIO 5** (Pino 7).
-    * A outra perna do botão conecta-se ao **GND** (qualquer pino de terra, como o Pino 8).
-
-  Pico W
-  +---------+
-  |         |
-GND --| 3       |
-|         |
-GND --| 8       |-- Botão -- GPIO 5 (Pino 7)
-|         |
-|         |
-|         |-- LED -- Resistor -- GND
-|         |    |
-|         |-- GPIO 11 (Pino 15)
-|         |
-+---------+
-
+| **Componente** | **Conexão**       |
+| -------------- | ----------------- |
+| **LED (+)**    | GPIO 11 (Pino 15) |
+| **LED (-)**    | Resistor -> GND   |
+| **Botão 1**    | GPIO 5 (Pino 7)   |
+| **Botão 2**    | GND               |
 
 ---
 
 ## 🚀 Configuração e Compilação
 
-Este projeto foi desenvolvido utilizando o **Pico SDK**.
+### 1️⃣ Configurar Wi-Fi
 
-### 1. Configurar Credenciais Wi-Fi
-
-Antes de compilar, abra o arquivo `.c` e altere as seguintes linhas com os dados da sua rede Wi-Fi:
+No arquivo `.c`:
 
 ```c
-#define WIFI_SSID "SuaRedeWiFi"
+#define WIFI_SSID "SeuSSID"
 #define WIFI_PASSWORD "SuaSenha"
-2. Arquivo CMakeLists.txt
-Para compilar o projeto, você precisará de um arquivo CMakeLists.txt no mesmo diretório do seu código. Use o exemplo abaixo:
+```
 
-CMake
+### 2️⃣ Arquivo `CMakeLists.txt` Exemplo:
 
-# Versão mínima do CMake
+```cmake
 cmake_minimum_required(VERSION 3.13)
-
-# Inicializa o projeto com o Pico SDK
 include(pico_sdk_import.cmake)
 project(pico_w_web_monitor C CXX ASM)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
-# Importa as definições do SDK
 pico_sdk_init()
 
-# Adiciona o executável
-add_executable(<span class="math-inline">\{PROJECT\_NAME\}
-seu\_arquivo\.c \# <\-\- TROQUE PELO NOME DO SEU ARQUIVO \.C
-\)
-\# Habilita o suporte a Wi\-Fi no Pico W
-pico\_enable\_sdk\_section\("pico\_cyw43\_arch\_lwip\_threadsafe\_background"\)
-\# Adiciona as bibliotecas necessárias
-target\_link\_libraries\(</span>{PROJECT_NAME}
+add_executable(${PROJECT_NAME}
+    seu_arquivo.c
+)
+
+pico_enable_stdio_usb(${PROJECT_NAME} 1)
+pico_enable_stdio_uart(${PROJECT_NAME} 1)
+
+pico_enable_sdk_section(${PROJECT_NAME} "pico_cyw43_arch_lwip_threadsafe_background")
+
+target_link_libraries(${PROJECT_NAME}
     pico_stdlib
     pico_cyw43_arch_lwip_threadsafe_background
     hardware_adc
 )
 
-# Habilita a saída USB e UART para `printf`
 pico_add_extra_outputs(${PROJECT_NAME})
-3. Compilar o Projeto
-Com o ambiente do Pico SDK configurado, navegue até o diretório do projeto e execute os seguintes comandos:
+```
 
-Bash
+### 3️⃣ Compilação:
 
-# Cria um diretório de compilação
+```bash
 mkdir build
 cd build
-
-# Prepara os arquivos de compilação
 cmake ..
-
-# Compila o projeto
 make
-Isso irá gerar um arquivo .uf2 dentro da pasta build.
+```
 
-💻 Uso
-Flashear o Pico W: Pressione e segure o botão BOOTSEL no seu Pico W enquanto o conecta ao computador. Ele aparecerá como um dispositivo de armazenamento.
-Arraste e solte o arquivo ${PROJECT_NAME}.uf2 (gerado na pasta build) para dentro do Pico. A placa irá reiniciar automaticamente.
-Descobrir o IP: Abra um monitor serial (usando PuTTY, o terminal do Thonny, ou o Serial Monitor do VS Code) para ver as mensagens de log. Assim que o Pico W se conectar à rede, ele imprimirá seu endereço IP.
-Conectado com sucesso!
-IP do dispositivo: 192.168.1.XX
-Acessar a Página: Em um navegador web (no celular ou computador) na mesma rede Wi-Fi, acesse o endereço IP exibido.
-Testar: Pressione o botão e veja o LED acender e o log de eventos ser atualizado na página web!
+---
 
-📂 Explicação do Código
-O código C é dividido em blocos organizados por responsabilidade:
+## 💻 Como Usar
 
-📦 1. Inclusões e Definições
+1️⃣ **Gravar no Pico W:**
+Pressione e segure **BOOTSEL** → conecte ao PC → copie o `.uf2` para o dispositivo.
 
-#include "pico/stdlib.h" // Funções básicas (GPIO, delays)
-#include "hardware/adc.h" // Leitura da temperatura interna
-#include "lwip/tcp.h"     // Funções TCP/IP
-#include "pico/cyw43_arch.h" // Controle Wi-Fi
-➡️ Define pinos, buffers e estruturas auxiliares.
+2️⃣ **Descobrir o IP:**
+Abra um terminal serial para visualizar o IP. Exemplo de mensagem exibida após a conexão:
 
-🌐 2. Servidor TCP
-Funções que implementam o servidor web via TCP:
+```
+IP Address: 192.168.1.XX
+```
 
-Função	Função no Código
-init_tcp_server()	Inicializa o servidor escutando na porta 80.
-tcp_server_accept()	Aceita novas conexões TCP de navegadores.
-tcp_server_recv()	Processa a requisição GET e monta a página HTML.
-send_data()	Fragmenta o envio da resposta HTTP (caso o log seja grande).
-tcp_server_close()	Fecha conexões TCP finalizadas.
+⚠️ **Importante:** O endereço IP exibido **depende da sua rede**. Você verá o IP no terminal após a conexão.
 
-🔥 3. Monitoramento da Temperatura
+3️⃣ **Acessar via Navegador:**
+Digite o IP no navegador do seu celular ou computador conectado à mesma rede.
 
-void read_internal_temperature()
-➡️ Lê o sensor interno de temperatura do Pico W via ADC e converte para graus Celsius.
+**Exemplo:**
 
-🔘 4. Tratamento do Botão (com debounce)
+```
+http://192.168.1.25
+```
 
-if ((to_ms_since_boot(get_absolute_time()) - last_debounce_time) > DEBOUNCE_DELAY_MS) {
-➡️ Garante que múltiplos toques rápidos não gerem leituras repetidas.
+4️⃣ **Teste:**
+Pressione o botão → veja o LED acender → a página exibe o evento e atualiza automaticamente.
 
-Quando pressionado:
+---
 
-Atualiza o log de eventos.
+## 📂 Organização do Código
 
-Atualiza o status para "pressionado".
+| **Seção**           | **Descrição**                                                              |
+| ------------------- | -------------------------------------------------------------------------- |
+| 📦 **Inclusões**    | Bibliotecas do Pico, Wi-Fi, ADC, TCP/IP.                                   |
+| 🌐 **Servidor TCP** | Configura porta 80, aceita conexões, processa GET e envia a página HTML.   |
+| 🌡 **Temperatura**  | Função `read_internal_temperature()` lê o sensor interno via ADC.          |
+| 🔘 **Botão**        | Lógica de debounce → gera log → atualiza status → acende/desliga LED.      |
+| 🖥 **Página HTML**  | Interface HTML com estilos, log de eventos, status, temperatura e refresh. |
+| ♻️ **Loop**         | Atualiza temperatura, verifica botão e mantém comunicação TCP funcionando. |
 
-Acende o LED.
+---
 
-🕸️ 5. Página HTML Gerada
-A resposta HTML inclui:
+## 📜 Licença
 
-Temperatura atual formatada.
+MIT License – veja o arquivo LICENSE para detalhes.
 
-Status atual do botão.
 
-Área rolável com o log de eventos.
-
-Autoatualização automática a cada 2=1 segundos (<meta http-equiv="refresh" content="1">).
-
-♻️ 6. Loop Principal
-Responsável por:
-
-Atualizar o status do botão.
-
-Atualizar a temperatura.
-
-Manter o servidor TCP funcionando.
-
-Fazer debounce.
-
-while (true) {
-    cyw43_arch_poll();
-    ...
-}
-
-📜 Licença
-Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
