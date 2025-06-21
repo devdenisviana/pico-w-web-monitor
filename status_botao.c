@@ -10,8 +10,8 @@
 #include "lwip/netif.h"            // Interface de rede (lwIP)
 
 // Definições de constantes
-#define WIFI_SSID "Asgard"         // Nome da rede Wi-Fi
-#define WIFI_PASSWORD "ma199720@"  // Senha da rede Wi-Fi
+#define WIFI_SSID "suarede"         // Nome da rede Wi-Fi
+#define WIFI_PASSWORD "suasenha"  // Senha da rede Wi-Fi
 #define LED_PIN 11                 // Pino GPIO utilizado para controle do LED
 #define BUTTON_PIN 5               // Pino GPIO utilizado para leitura do botão
 #define DEBOUNCE_DELAY_MS 25       // Tempo para eliminar efeito de bouncing (oscilações) do botão
